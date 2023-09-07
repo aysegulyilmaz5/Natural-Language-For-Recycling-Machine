@@ -14,6 +14,7 @@ the user can use the card in certain places. The user is informed at first that 
 
 <img width="853" alt="Ekran Resmi 2023-09-07 17 13 02" src="https://github.com/aysegulyilmaz5/Natural-Language-For-Recycling-Machine/assets/83874900/f2527328-d690-45c8-8b75-aa0b638673be">
 
+<img width="728" alt="Ekran Resmi 2023-09-07 18 24 22" src="https://github.com/aysegulyilmaz5/Natural-Language-For-Recycling-Machine/assets/83874900/91c6821b-f727-4f1a-91f7-ec46ff2345f7">
 
 
 

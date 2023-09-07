@@ -10,5 +10,7 @@ Description of System Functionalities & Users
 You will encounter a screen when starting to use the machine. After the card is read, if your card information is valid, you can see your id number. You will place the bottle in the machine's chamber without any action for the bottle you will throw. The machine takes the bottle and checks whether there is water or not with its sensor with barcode reading. If the given product is valid, the bottles are added to the bottle tank, and if the supplied water is valid, they are added to the water tank. If the product given according to the barcode number is not valid, the product is returned to the user and the process is terminated. If the stages progress correctly, the balance is loaded as much as the bottle added by the user. The user receives this balance by choosing one of the options as donation or pay to card. If he chooses to donate, monthly donations are given to charities. If the card is paid,
 the user can use the card in certain places. The user is informed at first that the water he added is given to the municipality for irrigation in the parks.
 
+<img width="673" alt="Ekran Resmi 2023-09-07 17 12 51" src="https://github.com/aysegulyilmaz5/Natural-Language-For-Recycling-Machine/assets/83874900/2f0a1af8-9bbe-474a-b5b3-ac540dc7a4d2">
+
 
 

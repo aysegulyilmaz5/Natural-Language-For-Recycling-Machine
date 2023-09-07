@@ -1,0 +1,98 @@
+Natural Language components
+User Component
+Bool requestMade = False Int chosenBottleAmount = 0 Int chosenAmount
+Required
+bottlePayment(amount)
+Pre: requestMade = True
+Post: chosenAmount = amount && requestMade = False
+IdentifyCard (cardId) Pre: requestMade = False Post: requestMade = True
+Provided
+addBottle(bottleAmount)
+Pre: requestMade = True
+Post: chosenBottleAmount = bottleAmount
+
+----------------------------------------------------------------------------
+
+ScanCard Component
+Bool isValidCard = False; Bool reject = False; Provided
+IdentifyCard(card)
+Pre: isValidCard = False Post : if card == True
+isValidCard = True
+else
+isValidCard = False &&
+reject = True
+
+----------------------------------------------------------------------------
+
+Barcode Component
+Bool isRecycleableBottle = False; Bool reject = False;
+Provided
+checkBottle(barcode)
+Pre: isRecycleableBottle = False Post: if barcode == True
+isRecycleableBottle = True
+else
+isRecycleableBottle = False && reject = True
+Required AddBottle(addbottle)
+Pre: isRecycleableBottle = False Post: if addbottle = True
+BarcodeDetect(barcode);
+else reject = True; waterDetect(waterDetectorValue) Pre:waterDetectorValue = True; Post:isWater = True
+
+-----------------------------------------------------------------------------
+
+WaterDetector Component
+Bool isRecycleableBottle = False Bool isWater = False
+Bool reject = False
+Bool isEmpty=False;
+Bool RequestforDimension=False; Provided
+waterDetect (waterDetectorValue ) Pre: isRecycleableBottle = True Post: If waterDetectorValue ≠ False
+isWater = True
+Else isWater = False && reject = True
+addWater()
+ 
+Pre: isWater = True Post: isWater= False
+emptyBottle() Pre:isEmpty =False Post:If isEmpty= True
+RequestforDimension=True
+Required
+checkBottle (isRecycleableBottle) Pre: isRecycleableBottle = False Post: If isRecycleableBottle = True
+nothing
+Else reject = True
+
+-------------------------------------------------------------------------------
+
+
+WaterTank Component
+Bool isFull = False Bool reject = False Bool putWater = False
+Required
+addWater( )
+Pre: isFull = False && putWater = False Post: putWater = True
+checkTank ( TankFull)
+Pre: isFull = False
+Parametre Assignment: isFull = TankFull Post: isFull = True && reject = True
+
+-------------------------------------------------------------------------------
+
+Payment Component
+Bool scanCard = False
+Int bottleSize = 0
+Amount paymentAmount = 0 Bool isDonate = False
+Bool paymentCard = False Provided
+pay(amount)
+pre:paymentCard = False && amount ≠ 0 post:paymentCard = True
+donate(amount)
+pre:isDonate = False && amount ≠ 0 post:isDonate = True
+Required
+checkBottlePayment(bottleAmount) pre:scanCard=True && bottleAmount ≠ 0 post:bottleSize = bottleAmount && scanCard = False
+
+-------------------------------------------------------------------------------
+
+Dimension Component
+Amount bottleAmount = 0
+Bool barcode = False
+Bool CalculateDimension = False Bool reject = False
+Bool calculatePayment = False Provided
+checkBottleSize(amount)
+pre:calculateDimension = False && amount ≠ 0
+Post: calculateDimension = True && bottleAmount = amount
+checkBottlePayment(bottleAmount)
+Pre: calculateDimension = True && bottleAmount ≠ 0
+Post: calculatePayment = True && calculateDimension = False

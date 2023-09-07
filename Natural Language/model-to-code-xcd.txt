@@ -1,0 +1,163 @@
+XCD
+Enum Amount :=[None,Little,Average,Much];
+User Component
+Bool requestMade = False Int chosenBottleAmount = 0 emitter port addbottle{
+@interaction{waits: requestMade = true } @functional {
+requires: requestMade := false;
+ensures: chosenBottleAmount := bottleAmount;
+}
+check (Bool barcode );
+}
+consumer port bottlePayment {
+@interaction{ waits: requestMade == true;} @functional {
+requires:\ chosenAmount := amount;
+ensures: && requestMade := false; Otherwise:
+ 
+requires:\exception==MissingPaymentException;}
+ensures:\nothing; } pay (Amount amount );
+}
+emitter port addCard {
+@interaction { wait: requestMade == false} @functional {
+promises :cardId:= id;
+ensures: requestMade := true; }
+cardValidation (Int Id ); }
+
+component ScanCard(bool card){ Bool isValidCard = False;
+Bool reject = False ;
+consumer port IdentifyCard{
+@interaction {waits:isValidCard == false;}
+@functional {
+requires:cardId == Id;
+ensures: isValidCard=True; otherwise:
+requires: ! (cardId == Id);
+ensures:reject = True; }
+cardValidation (Int Id ); }
+—----------------------------------------------------------------------------------------------------
+Barcode Component
+Bool isRecycleableBottle = False; Bool reject = False ;
+consumer port check{
+@interaction{waits: isRecycleableBottle = False}
+@functional {
+requires: barcode ==True
+ensures: isRecycleableBottle := True otherwise:
+requires: isRecycleableBottle = False; ensures: reject = True;
+}
+check (Bool barcode ); }
+—----------------------------------------------------------------------------------------------------
+
+Component payment(){
+bool scanCard := false;
+int bottleSize := 0;
+amount paymentAmount := 0 ; bool isDonate := false;
+bool paymentCard := false;
+emitter port pay{ @interaction{waits:!paymentCard} @functional{
+promises:amount \in [Little,Much] ensures: paymentCard := true;
+paymentAmount := amount;
+otherwise:
+promises:amount\in [Little,Much]; Ensures: isDonate := true;
+paymentAmount := amount; }pay(Amount amount);
+consumer port checkBottlePayment{ @interaction{waits:scanCard == true;} @functional{
+requires: amount\in [Little,Much]; ensures:scanCard := false;
+bottleSize := amount; }checkBottlePayment()
+Enum size := [a,b,c];
+
+—----------------------------------------------------------------------------------------------------
+
+Component Dimension(){
+Amount bottleAmount := 0;
+bool barCode := false;
+bool calculateDimension := false; bool reject := false;
+bool calculatePayment := false;
+}
+emitter port checkBottleSize{ @interaction{waits:!calculateDimension} @functional{
+promises: bottleAmount\in [a,c];
+ensures: calculateDimension := true; otherwise:
+promises:\exception == MissingSizeException; ensures: reject := true
+@interaction{waits:!calculatePayment} @functional{
+} }
+promises:calculateDimension := true; bottleAmount\in[a,c];
+ensures:calculatePayment :=true; calculateDimension:=false;
+
+—----------------------------------------------------------------------------------------------------
+
+Component waterDetector () {
+Bool isRecycleableBottle := false; Bool isWater := false;
+Bool reject := false;
+Bool putWater := false;
+Bool isEmpty:=false;
+Bool RequestforDimension:=false; Amount waterAmount := None;
+emitter port waterDetect { @interact {
+waits : isReceableBottle == true; & putWater == false;
+} @functional {
+promises: waterDetectorValue != false; & waterAmount += amount;
+ensures: isWater := true; & putWater := true;
+otherwise:
+promises: waterDetectorValue == false; ensures : isWater := true; & reject := true;
+}addWater( Bool waterDetectorValue, Amount amount, Amount waterAmount);
+consumer port emptyBottle{ @interaction {waits :isEmpty == false;}
+@functional { requires:isEmpty==true;
+ensures: ;RequestforDimension:= true; }checkBottleSize();
+}
+
+—----------------------------------------------------------------------------------------------------
+
+Component waterTank ( ){ Bool isFull := false; Bool reject := false;
+Amount maxAmount := Much;
+consumer port checkTank {
+@interaction {waits :isFull == false;}
+ 
+@functional {
+requires : waterAmount == maxAmount; ensures : isFull = true;
+otherwise:
+requires: !(waterAmount == maxAmount); ensures: isFull := false;
+}
+addWater( Bool waterDetectorValue, Amount amount, Amount waterAmount);
+}
+
+--------------------------------------------------------------------------------------------
+connector User2ScanCard ( User {addCard}, ScanCard{ IdentifyCard}) {
+role User{emitter port_variable addCard { cardValidation (Int Id ); }}
+role ScanCard{consumer port_variable IdentifyCard {cardValidation(Int Id ); }} connector user2scanCard_addCard( User {addCard}, ScanCard{ IdentifyCard});
+}
+----------------------------------------------------------------------------------------------
+connector User2Barcode (User {addBottle }, Barcode{ check }) {
+role User {emitter port_variable addBottle{ check ( Bool barcode) ; } } role Barcode { consumer port_variable check{ check ( Bool barcode) ; }} connector user2barcode_addBottle (User {addBottle}, Barcode{ check });
+
+-----------------------------------------------------------------------------------------------
+connector User2Payment(User {bottlePayment}, Payment {pay} ) {
+role User { consumer port_variable bottlePayment{ pay( Amount amount);} } role Payment{ emitter port_variable pay{pay(Amount amount);}}
+connector user2payment_bottlePayment(User{bottlePayment},Payment{pay});
+}
+-----------------------------------------------------------------------------------------------
+Connector waterDetector2Dimension(waterDetector {waterDetect }, Dimension{emptyBottle} ) { role waterDetector{ consumer port_variable emptyBottle{checkBottleSize();} }
+role Dimension{ emitter port_variable checkBottleSize{checkBottleSize();}}
+connector
+waterdetector2dimension_checkBottleSize(waterDetector{emptyBottle},Dimension{checkBottleSize}); }
+
+-----------------------------------------------------------------------------------------------
+
+Connector Payment2Dimension(Payment{checkBottlePayment},Dimension{checkBottlePayment}){ role Payment{consumer port_variable checkBottlePayment();} }
+role Dimension{emitter port_variable checkBottlePayment();} }
+connector
+payment2checkbottle_payment{Payment{checkbottlePayment1},Dimension{checkBottlePayment});
+
+-----------------------------------------------------------------------------------------------
+
+Connector waterDetector2waterTank ( waterDetector {waterDetect} , waterTank{checkTank} ) {
+role waterDetector{ emitter port_variable waterDetect{ addWater ( Bool waterDetectorValue,
+Amount amount, Amount waterAmount); }}
+role waterTank { consumer port_variable checkTank{ addWater ( Bool waterDetectorValue,
+Amount amount, Amount waterAmount); }}
+Connector waterDetector2waterTank_addWater(waterDetector {waterDetect},
+waterTank{checkTank});
+
+-----------------------------------------------------------------------------------------------
+
+Component RecyclerMachine(){ Component user userIns();
+Component barcode barcodeIns(); Component payment paymentIns(); Component dimension dimensionIns(); Component waterdetector waterdetectorIns(); Component waterTank waterTankIns(); Component scancard scancardIns();
+Connector User2Scancard conn1();
+Connector User2Barcode conn2(userIns{addbottle},barcodeIns{check}); Connector User2Payment conn3(userIns{bottlePayment},paymentIns{pay}); Connector waterDetector2Dimension
+conn4(waterdectorIns{waterdetect},dimensionIns{emptybottle}); Connector Payment2Dimension
+conn5(paymentIns{checkbottlePayment},dimensionIns{checkbottlePayment});
+Connector waterDetctor2waterTank(waterdetectIns{waterDetect},waterTankIns{checkTank};
+}
